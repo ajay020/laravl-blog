@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
@@ -69,5 +70,49 @@ class PostController extends Controller
         ]);
 
         return redirect()->route('home');
+    }
+
+    public function edit(Post $post)
+    {
+        return view('posts.edit', compact('post'));
+    }
+
+    public function update(Request $request, Post $post)
+    {
+        // dd($request->all());
+
+        $request->merge([
+            'slug' => str()->slug($request->input('title')),
+        ]);
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'excerpt' => ['nullable', 'string', 'max:500'],
+            'published' => ['nullable', 'boolean'],
+            'body' => ['required', 'string'],
+            'slug' => [
+                'required',
+                Rule::unique('posts', 'slug')->ignore($post->id),
+            ],
+        ]);
+
+
+        $validated['published'] = $request->boolean('published');
+
+        dd($validated);
+
+        $post->update($validated);
+
+        return redirect()
+            ->route('posts.show', $post);
+    }
+
+    public function destroy(Post $post)
+    {
+        $post->delete();
+
+        return redirect()
+            ->route('home')
+            ->with('success', 'Post deleted successfully.');
     }
 }

@@ -3,12 +3,17 @@
 @section('title', 'Home - My Laravel Blog')
 
 @section('content')
-    <h2>{{ $title }}</h2>
+    @if (session('success'))
+        <div class="bg-green-100 text-green-800 p-3 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
 
+    <h2>{{ $title }}</h2>
     <p>Welcome to my first Laravel blog application.</p>
 
     @forelse ($posts as $post)
-        <a href="{{ route('posts.show', $post->slug) }}">
+        <a class="text-2xl font-bold " href="{{ route('posts.show', $post->slug) }}">
             <h3>{{ $post->title }}</h3>
         </a>
         <p>{{ $post->user->name }}</p>
