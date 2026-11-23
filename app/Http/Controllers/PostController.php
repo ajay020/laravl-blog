@@ -69,7 +69,8 @@ class PostController extends Controller
             'published' => $request->boolean('published'),
         ]);
 
-        return redirect()->route('home');
+        return redirect()->route('home')
+            ->with('success', 'Post created successfully.');
     }
 
     public function edit(Post $post)
@@ -104,7 +105,8 @@ class PostController extends Controller
         $post->update($validated);
 
         return redirect()
-            ->route('posts.show', $post);
+            ->route('posts.show', $post)
+            ->with('success', 'Post updated successfully.');
     }
 
     public function destroy(Post $post)
