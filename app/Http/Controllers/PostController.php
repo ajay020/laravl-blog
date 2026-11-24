@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class PostController extends Controller
@@ -22,8 +23,6 @@ class PostController extends Controller
             ->where('published', true)
             ->latest()
             ->paginate(3);
-
-        // print($posts);
 
         return view('home', compact('title', 'posts'));
     }
@@ -59,9 +58,7 @@ class PostController extends Controller
 
         $slug = str()->slug($validated['title']);
 
-        $user = User::where('email', 'admin@example.com')->firstOrFail();
-
-        $user->posts()->create([
+        $request->user()->posts()->create([
             'title' => $validated['title'],
             'slug' => $slug,
             'excerpt' => $validated['excerpt'],
@@ -82,6 +79,8 @@ class PostController extends Controller
     {
         // dd($request->all());
 
+        Gate::authorize('update', $post);
+
         $request->merge([
             'slug' => str()->slug($request->input('title')),
         ]);
@@ -100,8 +99,6 @@ class PostController extends Controller
 
         $validated['published'] = $request->boolean('published');
 
-        dd($validated);
-
         $post->update($validated);
 
         return redirect()
@@ -111,6 +108,9 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
+        // some logic to check if the user is authorized to delete the post
+        Gate::authorize('delete', $post);
+
         $post->delete();
 
         return redirect()

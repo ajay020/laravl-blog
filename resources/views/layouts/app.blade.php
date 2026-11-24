@@ -24,6 +24,18 @@
         <nav class="flex gap-4">
             <a href="{{ route('home') }}">Home</a>
             <a href="{{ route('posts.create') }}">Create Post</a>
+            @auth
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit">Logout</button>
+                </form>
+                <p>Hi, {{ auth()->user()->name }}</p>
+            @endauth
+
+            @guest
+                <a href="{{ route('login.store') }}">Login</a>
+                <a href="{{ route('register') }}">Register</a>
+            @endguest
         </nav>
     </header>
 
